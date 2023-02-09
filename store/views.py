@@ -7,6 +7,9 @@ from rest_framework import status
 from .serializers import ProductSerializer
 # Create your views here.
 
+def Customer_list(request):
+    return Response('ok')
+
 @api_view()
 def product_list(request):
     queryset = Product.objects.all()
