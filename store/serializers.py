@@ -21,3 +21,5 @@ class CollectionSerializer(serializers.Serializer):
 
     def serialized(self,collection:Collection):
         return 'THIS IS NEW TITLE: '+collection.title
+    
+    
