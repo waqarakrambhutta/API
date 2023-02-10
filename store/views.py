@@ -9,7 +9,9 @@ from .serializers import ProductSerializer,CollectionSerializer
 
 @api_view()
 def Collection_list(request):
-    return Response('ok')
+    collection = Collection.objects.all()
+    serializer = CollectionSerializer(collection,many=True)
+    return Response(serializer.data)
 
 
 @api_view()
