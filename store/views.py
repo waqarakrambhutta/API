@@ -2,22 +2,20 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Product,Customer
+from .models import Product,Collection
 from rest_framework import status
-from .serializers import ProductSerializer,CustomerSerializer
+from .serializers import ProductSerializer,CollectionSerializer
 # Create your views here.
 
 @api_view()
-def Customer_list(request):
-    customer = Customer.objects.all()
-    serializer = CustomerSerializer(customer,many=True)
+def Collection_list(request):
     return Response('ok')
 
 
 @api_view()
-def Customer_id(request,id):
-    get_id = Customer.objects.get(pk=id)
-    serializer = CustomerSerializer(get_id)
+def Collection_id(request,id):
+    get_id = Collection.objects.get(pk=id)
+    serializer = CollectionSerializer(get_id)
     return Response(serializer.data)
     
 
