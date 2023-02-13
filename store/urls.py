@@ -7,4 +7,5 @@ urlpatterns=[
     #this will also works if we put letter a or anything which is not in rules.
     path('products/<int:id>/',views.product_detail),
     path('collection/<int:pk>/',views.collection_detail,name='collection-detail'),
+    path('collection/',views.collection_list)
     ]
