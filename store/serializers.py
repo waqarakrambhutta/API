@@ -2,9 +2,10 @@ from rest_framework import serializers
 from decimal import Decimal
 from store.models import Product,Collection
 
-class CollectionSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    title = serializers.CharField(max_length=255)
+class CollectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collection
+        fields = '__all__'
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -20,7 +21,11 @@ class ProductSerializer(serializers.ModelSerializer):
         queryset=Collection.objects.all(),
         view_name='collection-detail'
     )
-        
+
+    def validate(self,data):
+        if data['password'] != data['confirm_password']:
+            return serializers.ValidationError('password does not match.')
+        return data
 
     
 
