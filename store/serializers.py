@@ -5,7 +5,7 @@ from store.models import Product,Collection
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
-        fields = '__all__'
+        fields = ['id','title','featured_product']
 
 
 class ProductSerializer(serializers.ModelSerializer):

@@ -19,10 +19,19 @@ def collection_list(request):
         return Response(serializer.data)
     
 
-@api_view()
-def collection_detail(request,pk): # remember it is pk not id.
-    return Response('ok')
-
+@api_view(['GET','PATCH'])
+def collection_detail(request,id):
+    collection = get_object_or_404(Collection,pk=id)
+    if request.method=='GET':
+        serailizer = CollectionSerializer(collection)
+        return Response(serailizer.data)
+        # return Response()
+    elif request.method=='PATCH':
+        serailizer=CollectionSerializer(data=request.data)
+        serailizer.is_valid(raise_exception=True)
+        serailizer.save()
+        return Response(serailizer.data)
+    # return Response('ok')
 
 
 
