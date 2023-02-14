@@ -3,12 +3,13 @@ from rest_framework.decorators import api_view
 from .serializers import CollectionSerializer
 from .models import Collection
 from rest_framework import status
+from django.db.models import Count
 
 
 @api_view(['GET','POST'])
 def collection_list(request):
     if request.method == 'GET':
-        collection = Collection.objects.all()
+        collection = Collection.objects.annotate(product_count=Count('product')).all()
         serializer = CollectionSerializer(collection,many=True)
         return Response(serializer.data)
     elif request.method == 'POST':
@@ -19,7 +20,7 @@ def collection_list(request):
 
 @api_view(['GET','PATCH','DELETE'])
 def collection_detail(request,id):
-    collection = Collection.objects.get(pk=id) 
+    collection = Collection.objects.annotate(product_count=Count('product')).get(pk=id) 
     if request.method == 'GET':
         serializer = CollectionSerializer(collection)
         return Response(serializer.data)
