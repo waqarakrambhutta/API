@@ -1,21 +1,85 @@
 from rest_framework import serializers
-from decimal import Decimal
-from store.models import Product,Collection
-
-class CollectionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Collection
-        fields = ['id','title','featured_product']
+from .models import Collection,Product
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ['id','description','unit_price','title','inventory','price_with_tax','collection']
+class CollectionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField(max_length=255)
+
+    def create(self, validated_data):
+        serializer = Collection(**validated_data)
+        serializer.other = 1
+        serializer.save()
+        return serializer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# from rest_framework import serializers
+# from decimal import Decimal
+# from store.models import Product,Collection
+
+# class CollectionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Collection
+#         fields = ['id','title','featured_product']
+
+
+# class ProductSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Product
+#         fields = ['id','description','unit_price','title','inventory','price_with_tax','collection']
         
-    price_with_tax=serializers.SerializerMethodField(method_name='include_tax')
-    def include_tax(self,product):
-        return product.unit_price * Decimal(1.1)
+#     price_with_tax=serializers.SerializerMethodField(method_name='include_tax')
+#     def include_tax(self,product):
+#         return product.unit_price * Decimal(1.1)
     
 
 
