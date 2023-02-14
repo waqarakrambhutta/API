@@ -34,18 +34,6 @@ def collection_detail(request,id):
     # return Response('ok')
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 @api_view(['GET','POST'])
 def product_list(request):
     if request.method == 'GET':
@@ -63,7 +51,7 @@ def product_list(request):
         
 
 
-@api_view(['GET','PATCH'])
+@api_view(['GET','PATCH','DELETE'])
 def product_detail(request,id):
     product=get_object_or_404(Product,pk=id)
     if request.method == 'GET':
@@ -74,6 +62,11 @@ def product_detail(request,id):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+    elif request.method == 'DELETE':
+        if product.orderitem_set.count()>0:
+            return Response({'errors':'Product cannot be created because it is associated with orderitem.'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
     
