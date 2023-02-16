@@ -6,76 +6,79 @@ from .models import Collection,Product
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.mixins import ListModelMixin,CreateModelMixin
+from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from django.db.models import Count
 
-class CollectionList(ListCreateAPIView):
+
+class CollectionViewSets(ModelViewSet):
     queryset = Collection.objects.annotate(product_count=Count('product')).all()
-    # for getting object.
-
     serializer_class = CollectionSerializer
-    # for posting object.
-
-
-
-class CollectionDetail(APIView):
-
-    def get(self,request,id):
-        collection = Collection.objects.annotate(product_count=Count('product')).get(pk=id)         
-        serializer = CollectionSerializer(collection)
-        return Response(serializer.data)
-    def patch(self,request):
-        collection = Collection.objects.annotate(product_count=Count('product')).get(pk=id) 
-        serializer = CollectionSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-    def delete(self,request):
-        collection = Collection.objects.annotate(product_count=Count('product')).get(pk=id) 
+    def delete(self,request,pk):
+        collection = Collection.objects.annotate(product_count=Count('product')).get(pk=pk) 
         collection.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-     
+
+   
 
 
 
 
-               
+class ProductList(ListCreateAPIView):
+    queryset = queryset = Product.objects.select_related('collection').all()
+    serializer_class = ProductSerializer
 
+    def get_serializer_context(self):
+        return {'request':self.request}
 
-@api_view(['GET','POST'])
-def product_list(request):
-    if request.method == 'GET':
-        queryset = Product.objects.select_related('collection').all()
-        serializer = ProductSerializer(
-            queryset, 
-            many=True,
-            context={'request':request})
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        serializer = ProductSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
+class ProductDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
-
-
-
-@api_view(['GET','PATCH','DELETE'])
-def product_detail(request,id):
-    product=get_object_or_404(Product,pk=id)
-    if request.method == 'GET':
-        serializer = ProductSerializer(product)
-        return Response(serializer.data)
-    elif request.method == 'PATCH':
-        serializer = ProductSerializer(product,data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-    elif request.method == 'DELETE':
+    def delete(self, request,pk):
+        product = get_object_or_404(Product,pk=pk)
         if product.orderitem_set.count()>0:
             return Response({'errors':'Product cannot be created because it is associated with orderitem.'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+        
+
+               
+
+
+# @api_view(['GET','POST'])
+# def product_list(request):
+#     if request.method == 'GET':
+        
+#         serializer = ProductSerializer(
+#             queryset, 
+#             many=True,
+#             context={'request':request})
+#         return Response(serializer.data)
+#     elif request.method == 'POST':
+#         serializer = ProductSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data,status=status.HTTP_201_CREATED)
+
+
+
+# @api_view(['GET','PATCH','DELETE'])
+# def product_detail(request,id):
+#     product=get_object_or_404(Product,pk=id)
+#     if request.method == 'GET':
+#         serializer = ProductSerializer(product)
+#         return Response(serializer.data)
+#     elif request.method == 'PATCH':
+#         serializer = ProductSerializer(product,data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data)
+#     elif request.method == 'DELETE':
+#         if product.orderitem_set.count()>0:
+#             return Response({'errors':'Product cannot be created because it is associated with orderitem.'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
+#         product.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
