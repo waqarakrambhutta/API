@@ -7,13 +7,19 @@ class CollectionSerializer(serializers.ModelSerializer):
         model= Collection
         fields = ['id','title','product_count']
 
-    product_count = serializers.IntegerField()
+    product_count = serializers.IntegerField(read_only=True)
 
     def create(self, validated_data):
         serializer = Collection(**validated_data)
         serializer.other = 1
         serializer.save()
         return serializer
+    
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id','title','unit_price','inventory','collection']
 
 
 
