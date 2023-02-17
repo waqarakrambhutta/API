@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Collection,Product
+from .models import Collection,Product,Reviews
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -22,6 +22,10 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id','title','unit_price','inventory','collection']
 
 
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reviews
+        fields = ['id','product','name','description','date']
 
 
 
