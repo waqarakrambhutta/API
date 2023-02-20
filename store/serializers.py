@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Collection,Product,Reviews
+from .models import Collection,Product,Review
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -24,9 +24,12 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Reviews
-        fields = ['id','product','name','description','date']
+        model = Review
+        fields = ['id','name','description','date']
 
+    def create(self, validated_data):
+        product_id = self.context['product_id']
+        return Review.objects.create(product_id=product_id,**validated_data)
 
 
 

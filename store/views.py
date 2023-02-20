@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .serializers import CollectionSerializer,ProductSerializer,ReviewSerializer
 from rest_framework.decorators import api_view
-from .models import Collection,Product,OrderItem,Reviews
+from .models import Collection,Product,OrderItem,Review
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.mixins import ListModelMixin,CreateModelMixin
@@ -20,11 +20,7 @@ class CollectionViewSets(ModelViewSet):
         # return Response(status=status.HTTP_204_NO_CONTENT)
         return super().destroy(request, *args, **kwargs)
 
-    # def delete(self,request,pk):
-    #     product = Collection.objects.annotate(product_count=Count('product')).get(pk=pk) 
-    #     product.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
-
+  
    
 
 
@@ -42,16 +38,38 @@ class ProductViewset(ModelViewSet):
     
 
 
-class ReviewViewset(ListCreateAPIView):
-    queryset = Reviews.objects.all()
+class ReviewViewset(ModelViewSet):
     serializer_class = ReviewSerializer
 
-    # def delete(self, request,pk):
-    #     product = get_object_or_404(Product,pk=pk)
-    #     if product.orderitem_set.count()>0:
-    #         return Response({'errors':'Product cannot be created because it is associated with orderitem.'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    #     product.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_queryset(self):
+        return Review.objects.filter(product_id=self.kwargs['product_pk'])
+
+    def get_serializer_context(self):
+        return {'product_id':self.kwargs['product_pk']}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
