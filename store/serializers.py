@@ -1,5 +1,30 @@
 from rest_framework import serializers
-from .models import Collection,Product,Review
+from .models import Collection,Product,Review,Cart,CartItem
+
+class CartSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(read_only=True)
+    class Meta:
+        model = Cart
+        fields = ['id','items']
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model= CartItem
+        fields=['id','quantity','cart_id','product_id']
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -22,6 +47,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id','title','slug','description','unit_price','inventory','collection']
 
 
+
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
@@ -30,52 +56,6 @@ class ReviewSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         product_id = self.context['product_id']
         return Review.objects.create(product_id=product_id,**validated_data)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # from rest_framework import serializers
