@@ -3,20 +3,38 @@ from .models import Cart,CartItem
 from rest_framework.decorators import api_view
 from django.http import request
 from rest_framework.response import Response
-from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin
+from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet,ModelViewSet
 from rest_framework.generics import RetrieveAPIView,ListCreateAPIView
 
-class CartViewset(ListCreateAPIView,CreateModelMixin,RetrieveModelMixin,GenericViewSet):
+class CartViewset(ListCreateAPIView,
+                  CreateModelMixin,
+                  RetrieveModelMixin,
+                  DestroyModelMixin,
+                  GenericViewSet):
+    
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
 
-class CartItemViewset(ListCreateAPIView,CreateModelMixin,RetrieveModelMixin,GenericViewSet):
+class CartItemViewset(ListCreateAPIView,
+                      CreateModelMixin,
+                      RetrieveModelMixin,
+                      DestroyModelMixin,
+                      GenericViewSet):
+    
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
 
 # def CartItem_list(request):
 #     return Response('ok')
+
+    
+class CartItemVeiwSet(ModelViewSet):
+    serializer_class = CartItemSerializer
+
+    def get_queryset(self):
+        return CartItem.objects.select_related('product').filter(cart_id=self.kwargs['cart_pk'])
+
 
 
 
