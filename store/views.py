@@ -30,10 +30,14 @@ class CartItemViewset(ListCreateAPIView,
 
     
 class CartItemVeiwSet(ModelViewSet):
+    http_method_names = ['get','post','patch','delete']
+    #To prevent put request along with the patch method.
     
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return AddCartItemSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateCartitemSerializer
         return CartItemSerializer
     
     def get_serializer_context(self):
