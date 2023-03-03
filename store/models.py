@@ -64,6 +64,7 @@ class Customer(models.Model):
         max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
     user = models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
 
+   
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
     
@@ -93,6 +94,12 @@ class Order(models.Model):
     payment_status = models.CharField(
         max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_STATUS_PENDING)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+
+    class Meta:
+        permissions = [
+            ('cancel_order','Can cancel order.')
+        ]
+
 
 
 class OrderItem(models.Model):
