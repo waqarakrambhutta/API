@@ -6,19 +6,8 @@ from django.db import transaction
 
 
 def say_hello(request):
-    with transaction.atomic():
-        order = Order()
-        order.customer_id= 1
-        order.save()
-
-        item =  OrderItem()
-        item.order_id=1
-        item.unit_price=1
-        item.quantity= 4
-        item.product_id =1 
-        item.save()
+    queryset= Product.objects.raw('SELECT * FROM store_product\
+                                  order by inventory')
 
 
-
-    return render(request, 'hello.html',{'name':'Waqar'})
-                                        #  ,'result':list(queryset)})
+    return render(request, 'hello.html',{'name':'Waqar','result':list(queryset)})
