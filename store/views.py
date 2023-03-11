@@ -1,11 +1,43 @@
-from .serializers import CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartitemSerializer
-from .models import Cart,CartItem
+from .serializers import CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartitemSerializer,ProductSerializer,CollectionSerializer,ReviewSerializer,CustomerSerializer
+from .models import Cart,CartItem,Product,OrderItem,Collection,Review,Customer
 from rest_framework.decorators import api_view
 from django.http import request
+from .pagination import DefaultPagination
+from .filters import ProductFilter
+from django.db.models import Count
+from rest_framework import status
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.response import Response
-from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin
+from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin,UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet,ModelViewSet
 from rest_framework.generics import RetrieveAPIView,ListCreateAPIView
+
+class CollectionViewSets(ModelViewSet):
+    queryset = Collection.objects.annotate(product_count=Count('product')).all()
+    serializer_class = CollectionSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        product = Collection.objects.annotate(product_count=Count('product')).get(pk=id) 
+        # return Response(status=status.HTTP_204_NO_CONTENT)
+        return super().destroy(request, *args, **kwargs)
+
+class ProductViewset(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    filter_backends =[DjangoFilterBackend,SearchFilter,OrderingFilter]
+    filterset_class = ProductFilter
+    pagination_class = DefaultPagination
+    search_fields = ['title','description']
+    ordering_fields = ['unit_price','last_update']
+
+    def get_serializer_context(self):
+        return {'request':self.request}
+    
+    def destroy(self, request, *args, **kwargs):
+        if OrderItem.objects.filter(product_id=kwargs['pk']).count()>0:
+            return Response({'errors':'Product cannot be created because it is associated with orderitem.'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().destroy(request, *args, **kwargs)
 
 class CartViewset(ListCreateAPIView,
                   CreateModelMixin,
@@ -47,7 +79,18 @@ class CartItemVeiwSet(ModelViewSet):
         return CartItem.objects.select_related('product').filter(cart_id=self.kwargs['cart_pk'])
 
 
-    
+class ReviewViewset(ModelViewSet):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        return Review.objects.filter(product_id=self.kwargs['product_pk'])
+
+    def get_serializer_context(self):
+        return {'product_id':self.kwargs['product_pk']}
+
+class CustomerViewset(CreateModelMixin,RetrieveModelMixin,UpdateModelMixin,GenericViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
 
 
 
@@ -109,46 +152,13 @@ class CartItemVeiwSet(ModelViewSet):
 # from .models import Collection,Product,OrderItem,Review
 
 
-# class CollectionViewSets(ModelViewSet):
-#     queryset = Collection.objects.annotate(product_count=Count('product')).all()
-#     serializer_class = CollectionSerializer
-
-#     def destroy(self, request, *args, **kwargs):
-#         product = Collection.objects.annotate(product_count=Count('product')).get(pk=id) 
-#         # return Response(status=status.HTTP_204_NO_CONTENT)
-#         return super().destroy(request, *args, **kwargs)
 
   
    
 
-
-# class ProductViewset(ModelViewSet):
-#     queryset = Product.objects.all()
-#     serializer_class = ProductSerializer
-#     filter_backends =[DjangoFilterBackend,SearchFilter,OrderingFilter]
-#     filterset_class = ProductFilter
-#     pagination_class = DefaultPagination
-#     search_fields = ['title','description']
-#     ordering_fields = ['unit_price','last_update']
-
-#     def get_serializer_context(self):
-#         return {'request':self.request}
-    
-#     def destroy(self, request, *args, **kwargs):
-#         if OrderItem.objects.filter(product_id=kwargs['pk']).count()>0:
-#             return Response({'errors':'Product cannot be created because it is associated with orderitem.'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
-#         return super().destroy(request, *args, **kwargs)
     
 
 
-# class ReviewViewset(ModelViewSet):
-#     serializer_class = ReviewSerializer
-
-#     def get_queryset(self):
-#         return Review.objects.filter(product_id=self.kwargs['product_pk'])
-
-#     def get_serializer_context(self):
-#         return {'product_id':self.kwargs['product_pk']}
 
 # class ProductList(ListCreateAPIView):
 #     queryset = queryset = Product.objects.select_related('collection').all()
