@@ -129,6 +129,9 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 
 
+
+
+
 # from rest_framework import serializers
 # from decimal import Decimal
 # from store.models import Product,Collection
