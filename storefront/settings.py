@@ -151,19 +151,18 @@ REST_FRAMEWORK = {
     ),
 }
 
-SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
-}
 
 AUTH_USER_MODEL = 'core.User'
 
 DJOSER = {
     'SERIALIZERS':{
-            'user_create': 'core.serializers.UserCreateSerializer'
+            'user_create': 'core.serializers.UserCreateSerializer',
+            'current_user': 'core.serializers.CurrentUserSerializer',
             #here we write the default serializers in the documentation.
     }
 }
 
 SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1)
 }

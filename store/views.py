@@ -8,6 +8,7 @@ from django.db.models import Count
 from rest_framework import status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin,UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet,ModelViewSet
@@ -88,9 +89,24 @@ class ReviewViewset(ModelViewSet):
     def get_serializer_context(self):
         return {'product_id':self.kwargs['product_pk']}
 
-class CustomerViewset(CreateModelMixin,RetrieveModelMixin,UpdateModelMixin,GenericViewSet):
+class CustomerViewset(CreateModelMixin,
+                      RetrieveModelMixin,
+                      UpdateModelMixin,
+                      GenericViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+
+    @action(detail=False,methods=['GET','PUT'])
+    def me(self,request): # the user has the user_id the middleware in the setting who inspect the user and attach the user from the database.
+        (customer,created) = Customer.objects.get_or_create(user_id=request.user.id)
+        if request.method == 'GET':
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+        elif request.method == 'PUT':
+            serializer = CustomerSerializer(customer,data=request.data)
+            serializer.is_valid()
+            serializer.save()
+            return Response(serializer.data)
 
 
 
