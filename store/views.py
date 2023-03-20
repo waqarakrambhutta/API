@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin,UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet,ModelViewSet
 from rest_framework.generics import RetrieveAPIView,ListCreateAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 class CollectionViewSets(ModelViewSet):
     queryset = Collection.objects.annotate(product_count=Count('product')).all()
@@ -95,6 +96,13 @@ class CustomerViewset(CreateModelMixin,
                       GenericViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    # we return objects here not classes.
 
     @action(detail=False,methods=['GET','PUT'])
     def me(self,request): # the user has the user_id the middleware in the setting who inspect the user and attach the user from the database.
