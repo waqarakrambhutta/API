@@ -14,10 +14,12 @@ from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyMod
 from rest_framework.viewsets import GenericViewSet,ModelViewSet
 from rest_framework.generics import RetrieveAPIView,ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from store.permissions import IsAdminOrReadOnly
 
 class CollectionViewSets(ModelViewSet):
     queryset = Collection.objects.annotate(product_count=Count('product')).all()
     serializer_class = CollectionSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def destroy(self, request, *args, **kwargs):
         product = Collection.objects.annotate(product_count=Count('product')).get(pk=id) 
@@ -90,10 +92,7 @@ class ReviewViewset(ModelViewSet):
     def get_serializer_context(self):
         return {'product_id':self.kwargs['product_pk']}
 
-class CustomerViewset(CreateModelMixin,
-                      RetrieveModelMixin,
-                      UpdateModelMixin,
-                      GenericViewSet):
+class CustomerViewset(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
     permission_classes = [IsAuthenticated]
