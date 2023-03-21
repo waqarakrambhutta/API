@@ -14,7 +14,7 @@ from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyMod
 from rest_framework.viewsets import GenericViewSet,ModelViewSet
 from rest_framework.generics import RetrieveAPIView,ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny,DjangoModelPermissions,DjangoModelPermissionsOrAnonReadOnly,IsAdminUser
-from store.permissions import IsAdminOrReadOnly,FullDjangoModelPermissions
+from store.permissions import IsAdminOrReadOnly,FullDjangoModelPermissions, ViewCustomerHistoryPermission
 
 class CollectionViewSets(ModelViewSet):
     queryset = Collection.objects.annotate(product_count=Count('product')).all()
@@ -97,8 +97,9 @@ class CustomerViewset(ModelViewSet):
     serializer_class = CustomerSerializer
     permission_classes = [IsAdminUser]
 
-
-    # we return objects here not classes.
+    @action(detail=True,permission_classes=[ViewCustomerHistoryPermission])
+    def history(self,request,pk):
+        return Response('ok')
 
     @action(detail=False,methods=['GET','PUT'])
     def me(self,request): # the user has the user_id the middleware in the setting who inspect the user and attach the user from the database.
