@@ -13,13 +13,13 @@ from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin,UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet,ModelViewSet
 from rest_framework.generics import RetrieveAPIView,ListCreateAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from store.permissions import IsAdminOrReadOnly
+from rest_framework.permissions import IsAuthenticated, AllowAny,DjangoModelPermissions,DjangoModelPermissionsOrAnonReadOnly,IsAdminUser
+from store.permissions import IsAdminOrReadOnly,FullDjangoModelPermissions
 
 class CollectionViewSets(ModelViewSet):
     queryset = Collection.objects.annotate(product_count=Count('product')).all()
     serializer_class = CollectionSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [DjangoModelPermissions]
 
     def destroy(self, request, *args, **kwargs):
         product = Collection.objects.annotate(product_count=Count('product')).get(pk=id) 
@@ -95,12 +95,9 @@ class ReviewViewset(ModelViewSet):
 class CustomerViewset(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated()]
+
     # we return objects here not classes.
 
     @action(detail=False,methods=['GET','PUT'])
