@@ -1,5 +1,5 @@
-from .serializers import CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartitemSerializer,ProductSerializer,CollectionSerializer,ReviewSerializer,CustomerSerializer
-from .models import Cart,CartItem,Product,OrderItem,Collection,Review,Customer
+from .serializers import CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartitemSerializer,ProductSerializer,CollectionSerializer,ReviewSerializer,CustomerSerializer,OrderSerializer
+from .models import Cart,CartItem,Product,OrderItem,Collection,Review,Customer,Order
 from rest_framework.decorators import api_view
 from django.http import request
 from .pagination import DefaultPagination
@@ -112,6 +112,12 @@ class CustomerViewset(ModelViewSet):
             serializer.is_valid()
             serializer.save()
             return Response(serializer.data)
+        
+class OrderViewset(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+
 
 
 
