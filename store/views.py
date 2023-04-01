@@ -1,4 +1,4 @@
-from .serializers import CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartitemSerializer,ProductSerializer,CollectionSerializer,ReviewSerializer,CustomerSerializer,OrderSerializer
+from .serializers import CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartitemSerializer,ProductSerializer,CollectionSerializer,ReviewSerializer,CustomerSerializer,OrderSerializer,CreateOrderSerializer
 from .models import Cart,CartItem,Product,OrderItem,Collection,Review,Customer,Order
 from rest_framework.decorators import api_view
 from django.http import request
@@ -114,8 +114,16 @@ class CustomerViewset(ModelViewSet):
             return Response(serializer.data)
         
 class OrderViewset(ModelViewSet):
-    serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateOrderSerializer
+        return OrderSerializer
+
+    def get_serializer_context(self):
+        return {'user_id':self.request.user.id}
+    
 
     def get_queryset(self):
         user= self.request.user
