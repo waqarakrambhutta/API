@@ -173,16 +173,6 @@ class CreateOrderSerializer(serializers.Serializer):
 
 
 
-
-
-
-
-
-
-
-
-
-
 # from rest_framework import serializers
 # from decimal import Decimal
 # from store.models import Product,Collection
