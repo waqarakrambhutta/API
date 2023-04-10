@@ -1,4 +1,4 @@
-from .serializers import CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartitemSerializer,ProductSerializer,CollectionSerializer,ReviewSerializer,CustomerSerializer,OrderSerializer,CreateOrderSerializer
+from .serializers import CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartitemSerializer,ProductSerializer,CollectionSerializer,ReviewSerializer,CustomerSerializer,OrderSerializer,CreateOrderSerializer,UpdateOrderSerializer
 from .models import Cart,CartItem,Product,OrderItem,Collection,Review,Customer,Order
 from rest_framework.decorators import api_view
 from django.http import request
@@ -114,13 +114,20 @@ class CustomerViewset(ModelViewSet):
             return Response(serializer.data)
         
 class OrderViewset(ModelViewSet):
-    http_method_names =  ['GET','PUT','PATCH','HEAD','OPTIONS']
+    http_method_names =  ['get','put','delete','patch','head','options']
 
     def get_permissions(self):
         if self.request.method in ['PATCH','DELETE']:
             return [IsAdminUser()]
         return [IsAuthenticated()]
 
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateOrderSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateOrderSerializer
+        return OrderSerializer
+        
     def create(self, request, *args, **kwargs):
         serializer = CreateOrderSerializer(
             data= request.data,
@@ -132,11 +139,7 @@ class OrderViewset(ModelViewSet):
         return Response(serializer.data)
 
 
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return CreateOrderSerializer
-        return OrderSerializer
-
+ 
     # def get_serializer_context(self):
     #     return {'user_id':self.request.user.id}
     
