@@ -103,7 +103,7 @@ class CustomerViewset(ModelViewSet):
 
     @action(detail=False,methods=['GET','PUT'])
     def me(self,request): # the user has the user_id the middleware in the setting who inspect the user and attach the user from the database.
-        (customer,created) = Customer.objects.get_or_create(user_id=request.user.id)
+        customer = Customer.objects.get(user_id=request.user.id)
         if request.method == 'GET':
             serializer = CustomerSerializer(customer)
             return Response(serializer.data)
