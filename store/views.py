@@ -114,7 +114,7 @@ class CustomerViewset(ModelViewSet):
             return Response(serializer.data)
         
 class OrderViewset(ModelViewSet):
-    http_method_names =  ['get','put','delete','patch','head','options']
+    http_method_names =  ['get','post','put','delete','patch','head','options']
 
     def get_permissions(self):
         if self.request.method in ['PATCH','DELETE']:
